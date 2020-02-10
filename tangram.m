@@ -115,8 +115,3 @@ insert_after(Es1, [S2,T2|Es2], [E3|Es3], X) :-
       % append(Es1, T, M3, S, T2I, Es2)
     else fail
   ).
-
-
-:- pred pick(list(int)::in, int::out, list(int)::out) is nondet.
-pick([X | Xs], X, Xs).
-pick([X | Xs], Y, [X | Zs]) :- pick(Xs, Y, Zs).
