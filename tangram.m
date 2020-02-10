@@ -35,9 +35,9 @@ main(!IO) :-
     % io.format("%s + %s = CAT\n", [First, Second], !IO),
     ( 
       if
-        X = [turn(90), step(1,0), turn(90)],
-        Y = [step(1,0), turn(90), step(1,0), turn(90), step(1,0)],
-        Z = [turn(90+45), step(0,4), turn(90+45), step(2,0), turn(90), step(2,0)],
+        X = [left(90), step(1,0), left(90)],
+        Y = [step(1,0), left(90), step(1,0), left(90), step(1,0)],
+        Z = [left(90+45), step(0,4), left(90+45), step(2,0), left(90), step(2,0)],
         insert_after(X, Y, Z, Result)
       then
         io.write(Result, !IO)
