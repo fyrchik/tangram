@@ -15,6 +15,9 @@
 %  turn(degree) -- is a turn left for a specified number of degrees.
 :- type elem ---> step(int,int); turn(int).
 
+% combine succeeds on all possible combinations of first 2 arguments.
+:- pred combine(list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
+
 :- pred insert_after(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 :- pred insert_before(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 
@@ -53,6 +56,7 @@
 :- implementation.
 
 :- import_module int, list, string.
+:- import_module solutions.
 
 main(!IO) :-
     % % 1 little square
@@ -74,36 +78,41 @@ main(!IO) :-
     % io.format("%s + %s = CAT\n", [First, Second], !IO),
     ( 
       if
-        X = [left(90), step(1,0), left(90)],
-        Y = [step(1,0), left(90), step(1,0), left(90), step(1,0)],
+        X = [left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0)],
         Z = [left(90+45), step(0,2), left(90+45), step(1,0), left(90), step(1,0)],
-        insert_after(X, Y, Z, Result1),
-        insert_before(X, Y, Z, Result2)
+        solutions(combine(X,Z), Out)
       then
-        io.write(X, !IO),
-        io.format("\n", [], !IO),
-        io.write(Y, !IO),
-        io.format("\n", [], !IO),
-        io.write(Z, !IO),
-        io.format("\nResult:\n", [], !IO),
-        io.write(Result1, !IO),
-        io.format("\n", [], !IO),
-        io.write(Result2, !IO),
+        io.format("Result\n", [], !IO),
+        write_list_elem(Out, !IO),
         io.format("\n", [], !IO)
       else
         io.write("no solutions", !IO)
     ).
 
+:- pred write_list_elem(list(list(elem))::in, io::di, io::uo) is det.
+write_list_elem([], !IO) :- io.format("\n", [], !IO).
+write_list_elem([E | Es], !IO) :-
+  io.write(E, !IO),
+  io.format("\n", [], !IO),
+  write_list_elem(Es, !IO).
+
 % elems are combined when we put them next to each other.
 % This means:
 %   1. Find a side (or `step`) in each of them.
 %   2. Collapse 2 lists into one.
-%   3. Possibly normalize the resulting list:
-%      - turn(0) and step(0,0) can be removed
-%      - 2 sucessive steps can be combined
-% :- pred combine_at(list(elem)::in, int::in, list(elem)::in, int::in, list(elem)::out) is nondet.
-% combine_at([E|Es],I1,F2,I2,F) = X :-
-%   if combine_at(Es,)
+%   3. Normalize the resulting list
+combine(A, B, Result) :- combine_aux([], A, B, Result).
+
+:- pred combine_aux(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
+combine_aux(_, [], _, _) :- fail.
+combine_aux(First, Second, Middle, Result) :-
+    insert_after(First, Second, Middle, Result)
+  ; insert_before(First, Second, Middle, Result)
+  ; (
+    [H | T] = Second,
+    append(First, [H], Next),
+    combine_aux(Next, T, Middle, Result)
+  ).
 
 % insert_after inserts third argument between first and second.
 % first argument must end in turn
