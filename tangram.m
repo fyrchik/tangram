@@ -121,7 +121,8 @@ insert_after(Es1, [S2,T2|Es2], [E3|Es3], X) :-
       append(X1, M3, X2),
       append(X2, [S], X3),
       append(X3, [T2I], X4),
-      append(X4, Es2, X)
+      append(X4, Es2, Y),
+      X = normalize(Y)
     else fail
   ).
 
@@ -137,7 +138,8 @@ insert_before(Es1, [S2,T2|Es2], Es3, X) :-
     then
        append(M1, [FirstT, FirstS], X1),
        append(X1, M3, X2),
-       append(X2, [LastT|Es2], X)
+       append(X2, [LastT|Es2], Y),
+       X = normalize(Y)
     else fail
   ).
 
