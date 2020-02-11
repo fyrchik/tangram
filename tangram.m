@@ -153,15 +153,16 @@ append_turns(turn(Deg1), turn(Deg2), turn((Deg1+Deg2+180) rem 360)).
 sub_turns(turn(Deg1), turn(Deg2), turn((Deg1-Deg2) rem 360)).
 invert_turn(turn(D), turn((-D) rem 360)).
 
+:- pred is_nil(elem::in) is semidet.
+is_nil(step(0,0)).
+is_nil(turn(0)).
+
 normalize([E1, E2 | Es]) = X :-
   (
-    if add_turns(E1, E2, E)
-    then X = normalize([E | Es])
-    else (
-      if add_steps(E1, E2, E)
-      then X = normalize([E | Es])
-      else X = Es
-    )
+    add_turns(E1, E2, E) -> X = normalize([E | Es])
+  ; add_steps(E1, E2, E) -> X = normalize([E | Es])
+  ; is_nil(E2) -> X = normalize([E1 | Es])
+  ; X = [E1 | normalize([E2 | Es])]
   ).
 normalize([E]) = [E].
 normalize([]) = [].
