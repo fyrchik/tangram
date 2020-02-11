@@ -118,7 +118,8 @@ left(A) = turn(A rem 360).
 right(A) = turn((-A) rem 360).
 
 add_steps(step(A1,B1),step(A2,B2), step(A1+A2,B1+B2)).
-sub_steps(step(A1,B1), step(A2,B2), step(A1-A2,B1-B2)).
+sub_steps(step(A1,B1), step(A2,B2), step(A,B)) :-
+  A >= 0, B >= 0, A = A1 - A2, B = B1 - B2.
 
 add_turns(turn(Deg1),turn(Deg2), turn((Deg1 + Deg2) rem 360)).
 append_turns(turn(Deg1), turn(Deg2), turn((Deg1+Deg2+180) rem 360)).
