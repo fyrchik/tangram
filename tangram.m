@@ -16,6 +16,7 @@
 :- type elem ---> step(int,int); turn(int).
 
 :- pred insert_after(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
+:- pred insert_before(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 
 % left is a turn left specified in degrees.
 :- func left(int) = elem.
@@ -76,9 +77,19 @@ main(!IO) :-
         X = [left(90), step(1,0), left(90)],
         Y = [step(1,0), left(90), step(1,0), left(90), step(1,0)],
         Z = [left(90+45), step(0,4), left(90+45), step(2,0), left(90), step(2,0)],
-        insert_after(X, Y, Z, Result)
+        insert_after(X, Y, Z, Result1),
+        insert_before(X, Y, Z, Result2)
       then
-        io.write(Result, !IO)
+        io.write(X, !IO),
+        io.format("\n", [], !IO),
+        io.write(Y, !IO),
+        io.format("\n", [], !IO),
+        io.write(Z, !IO),
+        io.format("\nResult:\n", [], !IO),
+        io.write(Result1, !IO),
+        io.format("\n", [], !IO),
+        io.write(Result2, !IO),
+        io.format("\n", [], !IO)
       else
         io.write("no solutions", !IO)
     ).
@@ -111,6 +122,22 @@ insert_after(Es1, [S2,T2|Es2], [E3|Es3], X) :-
       append(X2, [S], X3),
       append(X3, [T2I], X4),
       append(X4, Es2, X)
+    else fail
+  ).
+
+
+insert_before(Es1, [S2,T2|Es2], Es3, X) :-
+  (
+    if split_last(Es3, Mid, S3),
+       split_last(Mid, M3, T3),
+       append_turns(T3, T2, LastT),
+       split_last(Es1, M1, T1),
+       invert_turn(T1, FirstT),
+       sub_steps(S3, S2, FirstS)
+    then
+       append(M1, [FirstT, FirstS], X1),
+       append(X1, M3, X2),
+       append(X2, [LastT|Es2], X)
     else fail
   ).
 
