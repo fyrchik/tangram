@@ -76,7 +76,7 @@ main(!IO) :-
       if
         X = [left(90), step(1,0), left(90)],
         Y = [step(1,0), left(90), step(1,0), left(90), step(1,0)],
-        Z = [left(90+45), step(0,4), left(90+45), step(2,0), left(90), step(2,0)],
+        Z = [left(90+45), step(0,2), left(90+45), step(1,0), left(90), step(1,0)],
         insert_after(X, Y, Z, Result1),
         insert_before(X, Y, Z, Result2)
       then
@@ -159,12 +159,23 @@ invert_turn(turn(D), turn((-D) rem 360)).
 is_nil(step(0,0)).
 is_nil(turn(0)).
 
-normalize([E1, E2 | Es]) = X :-
+normalize(A) = Result :-
   (
-    add_turns(E1, E2, E) -> X = normalize([E | Es])
-  ; add_steps(E1, E2, E) -> X = normalize([E | Es])
-  ; is_nil(E2) -> X = normalize([E1 | Es])
-  ; X = [E1 | normalize([E2 | Es])]
+    if is_normalized(A)
+    then Result = A
+    else Result = normalize(normalize_once(A))
   ).
-normalize([E]) = [E].
-normalize([]) = [].
+
+:- pred is_normalized(list(elem)::in) is semidet.
+is_normalized(A) :- A = normalize_once(A).
+
+:- func normalize_once(list(elem)) = list(elem).
+normalize_once([E1, E2 | Es]) = X :-
+  (
+    is_nil(E2) -> X = normalize_once([E1 | Es])
+  ; add_turns(E1, E2, E) -> X = normalize_once([E | Es])
+  ; add_steps(E1, E2, E) -> X = normalize_once([E | Es]) 
+  ; X = [E1 | normalize_once([E2 | Es])]
+  ).
+normalize_once([E]) = [E].
+normalize_once([]) = [].
