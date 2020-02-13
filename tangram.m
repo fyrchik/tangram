@@ -177,7 +177,7 @@ invert_turn(turn(D), turn((-D) rem 360)).
 
 :- pred is_nil(elem::in) is semidet.
 is_nil(step(0,0)).
-is_nil(turn(0)).
+is_nil(turn(D)) :- D rem 360 = 0.
 
 normalize(A) = Result :-
   (
