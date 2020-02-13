@@ -126,7 +126,8 @@ combine_aux(First, Second, Middle, Result) :-
   ; (
     [H | T] = Second,
     append(First, [H], Next),
-    combine_aux(Next, T, Middle, Result)
+    combine_aux(Next, T, Middle, W),
+    Result = normalize(W)
   ).
 
 % insert_after inserts third argument between first and second.
@@ -181,10 +182,25 @@ is_nil(turn(D)) :- D rem 360 = 0.
 
 normalize(A) = Result :-
   (
-    if has_nil(A)
-    then Result = map(normalize_turn, A)
-    else Result = normalize(normalize_once(A))
+    % remove all nil elements
+    B = remove_nil(A),
+    % collapse sequences of turns/steps into one turn/step
+    C = collapse_elems(B),
+    % remove nils again. Note: only nil turns will be removed
+    % because no nil steps could appear during previous collapse.
+    D = remove_nil(C),
+    E = move_step_to_end(D),
+    % only steps will be collapsed here
+    F = collapse_elems(E),
+    Result = map(normalize_turn, F)
   ).
+
+:- func move_step_to_end(list(elem)) = list(elem).
+move_step_to_end([]) = [].
+move_step_to_end([E | Es]) = Result :-
+  if E = turn(_)
+  then Result = [E | Es]
+  else append(Es, [E], X), Result = X.
 
 :- func normalize_turn(elem) = elem.
 normalize_turn(X) = (X = turn(D) -> turn((D+360) rem 360 - 180); X).
@@ -193,14 +209,15 @@ normalize_turn(X) = (X = turn(D) -> turn((D+360) rem 360 - 180); X).
 has_nil([]).
 has_nil([E | Es]) :- if is_nil(E) then fail else has_nil(Es).
 
-:- func normalize_once(list(elem)) = list(elem).
-normalize_once([E1, E2 | Es]) = X :-
+:- func remove_nil(list(elem)) = list(elem).
+remove_nil(A) = negated_filter(is_nil, A).
+
+:- func collapse_elems(list(elem)) = list(elem).
+collapse_elems([]) = [].
+collapse_elems([E]) = [E].
+collapse_elems([E1, E2 | Es]) = Result :-
   (
-    is_nil(E2) -> X = normalize_once([E1 | Es])
-  ; add_turns(E1, E2, E) -> X = normalize_once([E | Es])
-  ; add_steps(E1, E2, E) -> X = normalize_once([E | Es])
-  ; E1 = turn(0) -> X = normalize_once([E2 | Es])
-  ; X = [E1 | normalize_once([E2 | Es])]
+    add_turns(E1, E2, E) -> Result = collapse_elems([E | Es])
+  ; add_steps(E1, E2, E) -> Result = collapse_elems([E | Es])
+  ; Result = [E1 | collapse_elems([E2 | Es])]
   ).
-normalize_once([E]) = [E].
-normalize_once([]) = [].
