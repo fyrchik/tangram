@@ -18,6 +18,10 @@
 % combine succeeds on all possible combinations of first 2 arguments.
 :- pred combine(list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
 
+% combine_list succeeds on all possible combinations of arguments from list
+% where every list element is used.
+:- pred combine_list(list(list(elem))::in, list(elem)::out) is nondet.
+
 :- pred insert_after(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 :- pred insert_before(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 
@@ -79,12 +83,12 @@ main(!IO) :-
     ( 
       if
         X = [left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0)],
+        Y = [left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0)],
         Z = [left(90+45), step(0,2), left(90+45), step(1,0), left(90), step(1,0)],
-        solutions(combine(X,Z), Out)
+        solutions(combine_list([X,Y,Z]), Out)
       then
         io.format("Result\n", [], !IO),
-        write_list_elem(Out, !IO),
-        io.format("\n", [], !IO)
+        write_list_elem(Out, !IO)
       else
         io.write("no solutions", !IO)
     ).
@@ -95,6 +99,17 @@ write_list_elem([E | Es], !IO) :-
   io.write(E, !IO),
   io.format("\n", [], !IO),
   write_list_elem(Es, !IO).
+
+combine_list([], []).
+combine_list([H], H).
+combine_list([F1 | T], Result) :-
+  (
+    [F2 | TT] = T,
+    combine(F1, F2, F),
+    combine_list([F | TT], Result)
+  ; combine_list(T, R),
+    combine(F1, R, Result)
+  ).
 
 % elems are combined when we put them next to each other.
 % This means:
