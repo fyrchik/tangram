@@ -182,9 +182,12 @@ is_nil(turn(0)).
 normalize(A) = Result :-
   (
     if is_normalized(A)
-    then Result = A
+    then Result = map(normalize_turn, A)
     else Result = normalize(normalize_once(A))
   ).
+
+:- func normalize_turn(elem) = elem.
+normalize_turn(X) = (X = turn(D) -> turn((D+360) rem 360 - 180); X).
 
 :- pred is_normalized(list(elem)::in) is semidet.
 is_normalized(A) :- A = normalize_once(A).
