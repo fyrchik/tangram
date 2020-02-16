@@ -206,8 +206,7 @@ move_step_to_end([E | Es]) = Result :-
 normalize_turn(X) = (X = turn(D) -> turn((D+180) mod 360 - 180); X).
 
 :- pred has_nil(list(elem)::in) is semidet.
-has_nil([]).
-has_nil([E | Es]) :- if is_nil(E) then fail else has_nil(Es).
+has_nil(A) :- any_true(is_nil, A).
 
 :- func remove_nil(list(elem)) = list(elem).
 remove_nil(A) = negated_filter(is_nil, A).
