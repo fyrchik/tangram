@@ -82,9 +82,9 @@ main(!IO) :-
     % io.format("%s + %s = CAT\n", [First, Second], !IO),
     ( 
       if
-        X = [left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0)],
-        Y = [left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0)],
-        Z = [left(90+45), step(0,2), left(90+45), step(1,0), left(90), step(1,0)],
+        X = [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)],
+        Y = [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)],
+        Z = [step(0,2), left(90+45), step(1,0), left(90), step(1,0), left(90+45)],
         solutions(combine_list([X,Y,Z]), Out)
       then
         io.format("Result\n", [], !IO),
@@ -133,12 +133,13 @@ combine_aux(First, Second, Middle, Result) :-
 % insert_after inserts third argument between first and second.
 % first argument must end in turn
 % second argument must start from step
-% third argument must start in turn
-insert_after(Es1, [S2,T2|Es2], [E3|Es3], X) :-
+% third argument must start in step
+insert_after(Es1, [S2,T2|Es2], Es3, X) :-
   (
     if split_last(Es1, M1, L1),
+       split_last(Es3, Mid3, E3),
        append_turns(L1, E3, T),
-       split_last(Es3, M3, L3),
+       split_last(Mid3, M3, L3),
        sub_steps(L3, S2, S),
        invert_turn(T2, T2I)
     then
@@ -149,10 +150,9 @@ insert_after(Es1, [S2,T2|Es2], [E3|Es3], X) :-
   ).
 
 
-insert_before(Es1, [S2,T2|Es2], Es3, X) :-
+insert_before(Es1, [S2,T2|Es2], [S3|Es3], X) :-
   (
-    if split_last(Es3, Mid, S3),
-       split_last(Mid, M3, T3),
+    if split_last(Es3, M3, T3),
        append_turns(T3, T2, LastT),
        split_last(Es1, M1, T1),
        invert_turn(T1, FirstT),
@@ -189,9 +189,8 @@ normalize(A) = Result :-
     % remove nils again. Note: only nil turns will be removed
     % because no nil steps could appear during previous collapse.
     D = remove_nil(C),
-    E = move_step_to_end(D),
     % only steps will be collapsed here
-    F = collapse_elems(E),
+    F = collapse_elems(D),
     Result = map(normalize_turn, F)
   ).
 
