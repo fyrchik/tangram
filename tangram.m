@@ -116,7 +116,20 @@ combine_list([F1 | T], Result) :-
 %   1. Find a side (or `step`) in each of them.
 %   2. Collapse 2 lists into one.
 %   3. Normalize the resulting list
-combine(A, B, Result) :- combine_aux([], A, B, R), Result = collapse_bound_steps(R).
+combine(A, B, Result) :-
+  combine_aux([], A, B, R)
+, R2 = collapse_bound_steps(R)
+, Result = max_to_head(R2).
+
+:- func max_to_head(list(elem)) = list(elem).
+max_to_head(List) = Result :- 
+  Ind = find_max_step_index(List),
+  (
+    if Ind > 0
+    then split_upto(Ind, List, Start, End)
+       , Result = append(End, Start)
+    else Result = List
+  ).
 
 :- pred combine_aux(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
 combine_aux(_, [], _, _) :- fail.
@@ -229,3 +242,19 @@ collapse_elems([E1, E2 | Es]) = Result :-
   ; add_steps(E1, E2, E) -> Result = collapse_elems([E | Es])
   ; Result = [E1 | collapse_elems([E2 | Es])]
   ).
+
+:- func find_max_step_index(list(elem)) = int.
+find_max_step_index(List) = Result :-
+  Compare =
+    (pred(Elem::in, IndCur::in, Next::out, Ind1::in, IndMax::out, Elem1::in, ElemMax::out) is det :-
+      Next = IndCur + 1,
+      (
+        if Elem = step(A,B)
+         , Elem1 = step(AMax,BMax)
+         , (A > AMax ; A = AMax, B > BMax)
+        then IndMax = IndCur, ElemMax = Elem
+        else IndMax = Ind1, ElemMax = Elem1
+      )
+    ),
+  foldl3(Compare, List, 0, _, -1, Ind, step(0, 0), _),
+  Result = Ind.
