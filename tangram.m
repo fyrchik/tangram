@@ -20,27 +20,6 @@
 :- pred insert_after(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 :- pred insert_before(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 
-% add_steps performs 2 steps successively.
-:- pred add_steps(elem::in, elem::in, elem::out) is semidet.
-
-% sub_steps performs 1-st step forwards and 2-nd step backwards.
-:- pred sub_steps(elem::in, elem::in, elem::out) is semidet.
-
-% add_turns performs 2 turns successively.
-:- pred add_turns(elem::in, elem::in, elem::out) is semidet.
-
-% sub_turns performs 1 turn left and the next in the opposite direction.
-:- pred sub_turns(elem::in, elem::in, elem::out) is semidet.
-
-% append_turns returns a turn which needs to be performed if
-%   2 figures are joined to each other side-by-side and
-%   corners a matched.
-:- pred append_turns(elem::in, elem::in, elem::out) is semidet.
-
-% invert_turn performs turn in the same direction but
-%   as if we were going backwards. 
-:- pred invert_turn(elem::in, elem::out) is semidet.
-
 % normalize returns normalized Figure representation.
 :- func normalize(list(elem)) = list(elem).
 
@@ -49,6 +28,7 @@
 :- implementation.
 
 :- import_module int, list, string.
+:- import_module utils.
 :- import_module solutions.
 
 main(!IO) :-
@@ -77,17 +57,11 @@ main(!IO) :-
         solutions(combine_list([X,Y,Z]), Out)
       then
         io.format("Result\n", [], !IO),
-        write_list_elem(Out, !IO)
+        write_traversal(Out, !IO)
       else
         io.write("no solutions", !IO)
     ).
 
-:- pred write_list_elem(list(list(elem))::in, io::di, io::uo) is det.
-write_list_elem([], !IO) :- io.format("\n", [], !IO).
-write_list_elem([E | Es], !IO) :-
-  io.write(E, !IO),
-  io.format("\n", [], !IO),
-  write_list_elem(Es, !IO).
 
 combine_list([], []).
 combine_list([H], H).
@@ -166,19 +140,6 @@ insert_before(Es1, [S2,T2|Es2], [S3|Es3], X) :-
     else fail
   ).
 
-add_steps(step(A1,B1),step(A2,B2), step(A1+A2,B1+B2)).
-sub_steps(step(A1,B1), step(A2,B2), step(A,B)) :-
-  A >= 0, B >= 0, A = A1 - A2, B = B1 - B2.
-
-add_turns(turn(Deg1),turn(Deg2), turn((Deg1 + Deg2) mod 360)).
-append_turns(turn(Deg1), turn(Deg2), turn((Deg1 + Deg2 + 180) mod 360)).
-sub_turns(turn(Deg1), turn(Deg2), turn((Deg1 - Deg2) mod 360)).
-invert_turn(turn(D), turn((-D) mod 360)).
-
-:- pred is_nil(elem::in) is semidet.
-is_nil(step(0,0)).
-is_nil(turn(D)) :- D mod 360 = 0.
-
 normalize(A) = Result :-
   (
     % remove all nil elements
@@ -212,12 +173,6 @@ move_step_to_end([E | Es]) = Result :-
 
 :- func normalize_turn(elem) = elem.
 normalize_turn(X) = (X = turn(D) -> turn((D+180) mod 360 - 180); X).
-
-:- pred has_nil(list(elem)::in) is semidet.
-has_nil(A) :- any_true(is_nil, A).
-
-:- func remove_nil(list(elem)) = list(elem).
-remove_nil(A) = negated_filter(is_nil, A).
 
 :- func collapse_elems(list(elem)) = list(elem).
 collapse_elems([]) = [].
