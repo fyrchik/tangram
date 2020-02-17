@@ -39,7 +39,7 @@ main(!IO) :-
             write_traversal3(Result, !IO)
     ).
 
-:- pred write_traversal3(list(list(list(elem)))::in, io::di, io::uo) is det.
+:- pred write_traversal3(list(list(figure))::in, io::di, io::uo) is det.
 write_traversal3([], !IO).
 write_traversal3([H|T], !IO) :-
     io.write_string("[\n", !IO),
@@ -47,7 +47,7 @@ write_traversal3([H|T], !IO) :-
     io.write_string("]\n", !IO),
     write_traversal3(T, !IO).
 
-:- pred test_single(list(list(elem))::in) is semidet.
+:- pred test_single(list(figure)::in) is semidet.
 test_single([Input, Result]) :-
     Result = collapse_elems(Input).
 

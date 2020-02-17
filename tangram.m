@@ -11,17 +11,17 @@
 :- pred main(io::di, io::uo) is cc_multi.
 
 % combine succeeds on all possible combinations of first 2 arguments.
-:- pred combine(list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
+:- pred combine(figure::in, figure::in, figure::out) is nondet.
 
 % combine_list succeeds on all possible combinations of arguments from list
 % where every list element is used.
-:- pred combine_list(list(list(elem))::in, list(elem)::out) is nondet.
+:- pred combine_list(list(figure)::in, figure::out) is nondet.
 
-:- pred insert_after(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
-:- pred insert_before(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
+:- pred insert_after(figure::in, figure::in, figure::in, figure::out) is semidet.
+:- pred insert_before(figure::in, figure::in, figure::in, figure::out) is semidet.
 
 % normalize returns normalized Figure representation.
-:- func normalize(list(elem)) = list(elem).
+:- func normalize(figure) = figure.
 
 %---------------------------------------------------------------------------%
 
@@ -86,7 +86,7 @@ combine(A, B, Result) :-
 , R2 = collapse_bound_steps(R)
 , Result = max_to_head(R2).
 
-:- func max_to_head(list(elem)) = list(elem).
+:- func max_to_head(figure) = figure.
 max_to_head(List) = Result :- 
   Ind = find_max_step_index(List),
   (
@@ -96,7 +96,7 @@ max_to_head(List) = Result :-
     else Result = List
   ).
 
-:- pred combine_aux(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
+:- pred combine_aux(figure::in, figure::in, figure::in, figure::out) is nondet.
 combine_aux(_, [], _, _) :- fail.
 combine_aux(First, Second, Middle, Result) :-
     insert_after(First, Second, Middle, Result)
@@ -156,7 +156,7 @@ normalize(A) = Result :-
     Result = map(normalize_turn, F)
   ).
 
-:- func collapse_bound_steps(list(elem)) = list(elem).
+:- func collapse_bound_steps(figure) = figure.
 collapse_bound_steps(Figure) = Result :-
   if [First, T | X] = Figure
    , split_last(X, M, Last)
@@ -166,7 +166,7 @@ collapse_bound_steps(Figure) = Result :-
   then Result = append(M, [S, T])
   else Result = Figure.
 
-:- func move_step_to_end(list(elem)) = list(elem).
+:- func move_step_to_end(figure) = figure.
 move_step_to_end([]) = [].
 move_step_to_end([E | Es]) = Result :-
   if E = turn(_)
@@ -176,7 +176,7 @@ move_step_to_end([E | Es]) = Result :-
 :- func normalize_turn(elem) = elem.
 normalize_turn(X) = (X = turn(D) -> turn((D+180) mod 360 - 180); X).
 
-:- func find_max_step_index(list(elem)) = int.
+:- func find_max_step_index(figure) = int.
 find_max_step_index(List) = Result :-
   Compare =
     (pred(Elem::in, IndCur::in, Next::out, Ind1::in, IndMax::out, Elem1::in, ElemMax::out) is det :-

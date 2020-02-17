@@ -31,19 +31,19 @@
 :- pred is_nil(elem::in) is semidet.
 
 % has_nil checks if traversal has nil elements.
-:- pred has_nil(list(elem)::in) is semidet.
+:- pred has_nil(figure::in) is semidet.
 
 % remove_nil remove all nil elements from the traversal.
-:- func remove_nil(list(elem)) = list(elem).
+:- func remove_nil(figure) = figure.
 
 % write_traversal prints traversal in the readable format.
-:- pred write_traversal(list(list(elem))::in, io::di, io::uo) is det.
+:- pred write_traversal(list(figure)::in, io::di, io::uo) is det.
 
 % read_traversal reads traversal from the string.
-:- pred read_traversal_from_string(string::in, read_result(list(elem))::out) is det.
+:- pred read_traversal_from_string(string::in, read_result(figure)::out) is det.
 
 % collapse_elems collapses successive multiple turns or steps into a single turn or step.
-:- func collapse_elems(list(elem)) = list(elem).
+:- func collapse_elems(figure) = figure.
 
 %---------------------------------------------------------------------------%
 :- implementation.
