@@ -116,7 +116,7 @@ combine_list([F1 | T], Result) :-
 %   1. Find a side (or `step`) in each of them.
 %   2. Collapse 2 lists into one.
 %   3. Normalize the resulting list
-combine(A, B, Result) :- combine_aux([], A, B, Result).
+combine(A, B, Result) :- combine_aux([], A, B, R), Result = collapse_bound_steps(R).
 
 :- pred combine_aux(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
 combine_aux(_, [], _, _) :- fail.
@@ -193,6 +193,16 @@ normalize(A) = Result :-
     F = collapse_elems(D),
     Result = map(normalize_turn, F)
   ).
+
+:- func collapse_bound_steps(list(elem)) = list(elem).
+collapse_bound_steps(Figure) = Result :-
+  if [First, T | X] = Figure
+   , split_last(X, M, Last)
+   , First = step(_,_)
+   , Last = step(_,_)
+   , add_steps(First, Last, S)
+  then Result = append(M, [S, T])
+  else Result = Figure.
 
 :- func move_step_to_end(list(elem)) = list(elem).
 move_step_to_end([]) = [].
