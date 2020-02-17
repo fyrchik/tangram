@@ -11,6 +11,7 @@
 
 :- import_module list.
 :- import_module types.
+:- import_module pprint.
 :- import_module utils.
 :- import_module tangram.
 
@@ -35,16 +36,11 @@ main(!IO) :-
         then
             io.write_string("ok\n", !IO)
         else
-            io.write_string("fail\n", !IO),
             write_traversal3(Result, !IO)
     ).
 
 :- pred write_traversal3(list(list(figure))::in, io::di, io::uo) is det.
-write_traversal3([], !IO).
-write_traversal3([H|T], !IO) :-
-    io.write_string("[\n", !IO),
-    write_traversal(H, !IO),
-    io.write_string("]\n", !IO).
+write_traversal3(List, !IO) :- pprint.write(80, to_doc(List), !IO).
 
 :- pred test_single(list(list(elem))::in) is semidet.
 test_single([Result | Elems]) :- tangram.combine_list(Elems, Result).
