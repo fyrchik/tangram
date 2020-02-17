@@ -18,10 +18,15 @@ main(!IO) :-
     % Result is a first element of a testcase.
     % Note: it must be in a normalized form.
     TestCases = [
-        [
+        [ % combine 2 equal squares into a rectangle
             [step(2,0), left(90), step(1,0), left(90), step(2,0), left(90), step(1,0), left(90)],
             [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)],
             [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)]
+        ],
+        [ % combine 2 equal triangles into a parallelogram
+            [step(1,0), left(135), step(0,2), left(45), step(1,0), left(135), step(0,2), left(45)],
+            [step(1,0), left(135), step(0,2), left(135), step(1,0), left(90)],
+            [step(1,0), left(135), step(0,2), left(135), step(1,0), left(90)]
         ]
     ],
     Result = negated_filter(test_single, TestCases),
