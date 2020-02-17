@@ -176,16 +176,6 @@ move_step_to_end([E | Es]) = Result :-
 :- func normalize_turn(elem) = elem.
 normalize_turn(X) = (X = turn(D) -> turn((D+180) mod 360 - 180); X).
 
-:- func collapse_elems(list(elem)) = list(elem).
-collapse_elems([]) = [].
-collapse_elems([E]) = [E].
-collapse_elems([E1, E2 | Es]) = Result :-
-  (
-    add_turns(E1, E2, E) -> Result = collapse_elems([E | Es])
-  ; add_steps(E1, E2, E) -> Result = collapse_elems([E | Es])
-  ; Result = [E1 | collapse_elems([E2 | Es])]
-  ).
-
 :- func find_max_step_index(list(elem)) = int.
 find_max_step_index(List) = Result :-
   Compare =

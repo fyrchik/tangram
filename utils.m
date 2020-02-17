@@ -42,6 +42,9 @@
 % read_traversal reads traversal from the string.
 :- pred read_traversal_from_string(string::in, read_result(list(elem))::out) is det.
 
+% collapse_elems collapses successive multiple turns or steps into a single turn or step.
+:- func collapse_elems(list(elem)) = list(elem).
+
 %---------------------------------------------------------------------------%
 :- implementation.
 
@@ -62,6 +65,15 @@ is_nil(turn(D)) :- D mod 360 = 0.
 has_nil(A) :- any_true(is_nil, A).
 
 remove_nil(A) = negated_filter(is_nil, A).
+
+collapse_elems([]) = [].
+collapse_elems([E]) = [E].
+collapse_elems([E1, E2 | Es]) = Result :-
+  (
+    add_turns(E1, E2, E) -> Result = collapse_elems([E | Es])
+  ; add_steps(E1, E2, E) -> Result = collapse_elems([E | Es])
+  ; Result = [E1 | collapse_elems([E2 | Es])]
+  ).
 
 write_traversal([], !IO) :- io.format("\n", [], !IO).
 write_traversal([E | Es], !IO) :-
