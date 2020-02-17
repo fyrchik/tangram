@@ -49,6 +49,7 @@
 :- implementation.
 
 :- import_module int.
+:- import_module pprint.
 
 add_steps(step(A1,B1),step(A2,B2), step(A1+A2,B1+B2)).
 sub_steps(step(A1,B1), step(A2,B2), step(A,B)) :-
@@ -75,11 +76,8 @@ collapse_elems([E1, E2 | Es]) = Result :-
   ; Result = [E1 | collapse_elems([E2 | Es])]
   ).
 
-write_traversal([], !IO) :- io.format("\n", [], !IO).
-write_traversal([E | Es], !IO) :-
-  io.write(E, !IO),
-  io.format("\n", [], !IO),
-  write_traversal(Es, !IO).
+write_traversal(List, !IO) :-
+  pprint.write(80, to_doc(List), !IO).
 
 
 read_traversal_from_string(String, Result) :-
