@@ -56,12 +56,14 @@ main(!IO) :-
         Z = [step(0,2), left(90+45), step(1,0), left(90), step(1,0), left(90+45)],
         solutions(combine_list([X,Y,Z]), Out)
       then
+        read_traversal_from_string("[step(1,0), turn(90), step(1,0), turn(90), step(1,0), turn(90), step(1,0), turn(90)].", Result),
+        io.write(Result, !IO),
+        io.nl(!IO),
         io.format("Result\n", [], !IO),
         write_traversal(Out, !IO)
       else
         io.write("no solutions", !IO)
     ).
-
 
 combine_list([], []).
 combine_list([H], H).

@@ -3,7 +3,7 @@
 
 :- interface.
 
-:- import_module io, list.
+:- import_module io, list, string.
 :- import_module types.
 
 % add_steps performs 2 steps successively.
@@ -39,6 +39,9 @@
 % write_traversal prints traversal in the readable format.
 :- pred write_traversal(list(list(elem))::in, io::di, io::uo) is det.
 
+% read_traversal reads traversal from the string.
+:- pred read_traversal_from_string(string::in, read_result(list(elem))::out) is det.
+
 %---------------------------------------------------------------------------%
 :- implementation.
 
@@ -65,5 +68,10 @@ write_traversal([E | Es], !IO) :-
   io.write(E, !IO),
   io.format("\n", [], !IO),
   write_traversal(Es, !IO).
+
+
+read_traversal_from_string(String, Result) :-
+  Pos0 = io.posn(1, 0, 0),
+  io.read_from_string("", String, length(String), Result, Pos0, _).
 
 %---------------------------------------------------------------------------%
