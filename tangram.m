@@ -6,14 +6,9 @@
 :- import_module io.
 :- import_module list.
 
-:- pred main(io::di, io::uo) is cc_multi.
+:- import_module types.
 
-% elem is discriminated union of 2 operations:
-%   step(a, b) -- is a step forward on a * x + b * y, where (x,y) is some basis.
-%     This is needed because x and y can be non-reductible to each other via rational number.
-%     In a classic tangram we have x = 1 and y = square root of 2 (or some multiple of it, actually 0.5 * sqrt(2)).
-%  turn(degree) -- is a turn left for a specified number of degrees.
-:- type elem ---> step(int,int); turn(int).
+:- pred main(io::di, io::uo) is cc_multi.
 
 % combine succeeds on all possible combinations of first 2 arguments.
 :- pred combine(list(elem)::in, list(elem)::in, list(elem)::out) is nondet.
@@ -24,12 +19,6 @@
 
 :- pred insert_after(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
 :- pred insert_before(list(elem)::in, list(elem)::in, list(elem)::in, list(elem)::out) is semidet.
-
-% left is a turn left specified in degrees.
-:- func left(int) = elem.
-
-% right is a turn right specified in degrees.
-:- func right(int) = elem.
 
 % add_steps performs 2 steps successively.
 :- pred add_steps(elem::in, elem::in, elem::out) is semidet.
@@ -176,9 +165,6 @@ insert_before(Es1, [S2,T2|Es2], [S3|Es3], X) :-
        X = normalize(Y)
     else fail
   ).
-
-left(A) = turn(A mod 360).
-right(A) = turn((-A) mod 360).
 
 add_steps(step(A1,B1),step(A2,B2), step(A1+A2,B1+B2)).
 sub_steps(step(A1,B1), step(A2,B2), step(A,B)) :-
