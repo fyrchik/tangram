@@ -84,8 +84,7 @@ insert_after(Es1, [S2,T2|Es2], Es3, X) :-
        sub_steps(L3, S2, S),
        invert_turn(T2, T2I)
     then
-      append(M1, [T | M3], X1),
-      append(X1, [S, T2I | Es2], Y),
+      condense([M1, [T], M3, [S, T2I], Es2], Y),
       X = normalize(Y)
     else fail
   ).
@@ -99,8 +98,7 @@ insert_before(Es1, [S2,T2|Es2], [S3|Es3], X) :-
        invert_turn(T1, FirstT),
        sub_steps(S3, S2, FirstS)
     then
-       append(M1, [FirstT, FirstS | M3], X1),
-       append(X1, [LastT | Es2], Y),
+       condense([M1, [FirstT, FirstS], M3, [LastT], Es2], Y),
        X = normalize(Y)
     else fail
   ).
