@@ -13,7 +13,7 @@ for file in *.m; do
         output=`bash -c ./$file`
         if [ "$output" != "ok" ]; then
             echo $file -- fail
-            echo ./$output
+            echo "$output"
             exit_code=1
        else
             echo $file -- ok
