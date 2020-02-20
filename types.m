@@ -50,7 +50,9 @@
 
 :- import_module int.
 
-normalize_turn(X) = (X = turn(D) -> turn((D+180) mod 360 - 180); X).
+% we use 179 so that 180 will be 180 and not -180
+% degrees are int anyway.
+normalize_turn(X) = (X = turn(D) -> turn((D+179) mod 360 - 179); X).
 
 is_positive(step(X,Y)) :-
   if X < 0
