@@ -14,8 +14,8 @@
 % where every list element is used.
 :- pred combine_list(list(figure)::in, figure::out) is nondet.
 
-:- pred insert_after(figure::in, figure::in, figure::in, figure::out) is semidet.
-:- pred insert_before(figure::in, figure::in, figure::in, figure::out) is semidet.
+:- pred insert_after(figure::in, figure::in, figure::in, figure::out) is nondet.
+:- pred insert_before(figure::in, figure::in, figure::in, figure::out) is nondet.
 
 % normalize returns normalized Figure representation.
 :- func normalize(figure) = figure.
@@ -74,33 +74,57 @@ combine_aux(First, Second, Middle, Result) :-
 % first argument must end in turn
 % second argument must start from step
 % third argument must start in step
-insert_after(Es1, [S2,T2|Es2], Es3, X) :-
+insert_after(Es1, [S2,T2|Es2], [S3,T31|Es3], X) :-
   (
-    if split_last(Es1, M1, L1),
-       split_last(Es3, Mid3, E3),
-       append_turns(L1, E3, T),
-       split_last(Mid3, M3, L3),
-       sub_steps(L3, S2, S),
-       invert_turn(T2, T2I)
-    then
-      condense([M1, [T], M3, [S, T2I], Es2], Y),
-      X = normalize(Y)
+    if split_last(Es1, M1, T1),
+       split_last(Es3, M3, T3Last),
+       append_turns(T1, T31, FirstT)
+    then (
+      S2 = S3,
+      append_turns(T3Last, T2, LastT),
+      condense([M1, [FirstT], M3, [LastT], Es2], Y)
+    ;
+      S2 > S3,
+      sub_steps(S2, S3, LastS),
+      LastT = reverse_turn(T3Last),
+      condense([M1, [FirstT], M3, [LastT, LastS, T2], Es2], Y)
+    ;
+      S3 > S2,
+      sub_steps(S2, S3, LastS),
+      LastT = reverse_turn(T2),
+      condense([M1, [FirstT], Es3, [LastS, LastT], Es2], Y)
+    ),
+    X = normalize(Y)
     else fail
   ).
 
 
-insert_before(Es1, [S2,T2|Es2], [S3|Es3], X) :-
+insert_before(Es1, [S2,T2|Es2], [S3,T31|Es3], X) :-
   (
-    if split_last(Es3, M3, T3),
-       append_turns(T3, T2, LastT),
-       split_last(Es1, M1, T1),
-       invert_turn(T1, FirstT),
-       sub_steps(S3, S2, FirstS)
-    then
-       condense([M1, [FirstT, FirstS], M3, [LastT], Es2], Y),
-       X = normalize(Y)
+    if split_last(Es1, M1, T1),
+       split_last(Es3, M3, T3Last),
+       append_turns(T3Last, T2, LastT)
+    then (
+      S2 = S3,
+      append_turns(T1, T31, FirstT),
+      condense([M1, [FirstT], M3, [LastT], Es2], Y)
+    ;
+      S2 > S3,
+      sub_steps(S2, S3, FirstS),
+      FirstT = reverse_turn(T31),
+      condense([Es1, [FirstS, FirstT], M3, [LastT], Es2], Y)
+    ;
+      S3 > S2,
+      FirstT = reverse_turn(T1),
+      sub_steps(S3, S2, FirstS),
+      condense([M1, [FirstT, FirstS, T31], M3, [LastT], Es2], Y)
+    ),
+    X = normalize(Y)
     else fail
   ).
+
+:- func reverse_turn(elem) = elem is semidet.
+reverse_turn(turn(D)) = normalize_turn(turn(D-180)).
 
 normalize(A) = Result :-
   (
@@ -132,9 +156,6 @@ move_step_to_end([E | Es]) = Result :-
   if E = turn(_)
   then Result = [E | Es]
   else append(Es, [E], X), Result = X.
-
-:- func normalize_turn(elem) = elem.
-normalize_turn(X) = (X = turn(D) -> turn((D+180) mod 360 - 180); X).
 
 :- func find_max_step_index(figure) = int.
 find_max_step_index(List) = Result :-

@@ -13,10 +13,7 @@
 
 % invert_turn performs turn in the same direction but
 %   as if we were going backwards. 
-:- pred invert_turn(elem::in, elem::out) is semidet.
-
-% is_nil checks if and element of traversal is nil.
-:- pred is_nil(elem::in) is semidet.
+:- func invert_turn(elem) = elem is semidet.
 
 % has_nil checks if traversal has nil elements.
 :- pred has_nil(figure::in) is semidet.
@@ -40,10 +37,7 @@
 :- import_module pprint.
 
 append_turns(turn(Deg1), turn(Deg2), turn((Deg1 + Deg2 + 180) mod 360)).
-invert_turn(turn(D), turn((-D) mod 360)).
-
-is_nil(step(0,0)).
-is_nil(turn(D)) :- D mod 360 = 0.
+invert_turn(turn(D)) = normalize_turn(turn(-D)).
 
 has_nil(A) :- any_true(is_nil, A).
 

@@ -20,6 +20,13 @@
 % right is a turn right specified in degrees.
 :- func right(int) = elem.
 
+% is_nil checks if and element of traversal is nil.
+:- pred is_nil(elem::in) is semidet.
+
+% normalize_turn returns normalized representation of a turn.
+% When applied to steps, argument is returned untouched.
+:- func normalize_turn(elem) = elem.
+
 % add_steps performs 2 steps successively.
 :- pred add_steps(elem::in, elem::in, elem::out) is semidet.
 
@@ -43,6 +50,8 @@
 
 :- import_module int.
 
+normalize_turn(X) = (X = turn(D) -> turn((D+180) mod 360 - 180); X).
+
 is_positive(step(X,Y)) :-
   if X < 0
   then Y >= 0, Y * Y > 2 * X * X
@@ -56,9 +65,13 @@ step(A1, A2) > step(B1, B2) :- is_positive(step(A1-B1, A2-B2)).
 left(A) = turn(A mod 360).
 right(A) = turn((-A) mod 360).
 
+is_nil(step(0,0)).
+is_nil(turn(D)) :- D mod 360 = 0.
+
 add_steps(step(A1,B1),step(A2,B2), step(A1+A2,B1+B2)).
-sub_steps(step(A1,B1), step(A2,B2), step(A,B)) :-
-  A >= 0, B >= 0, A = A1 - A2, B = B1 - B2.
+sub_steps(step(A1,B1), step(A2,B2), S) :-
+  S = step(A1 - A2, B1 - B2),
+  (is_nil(S) ; is_positive(S)).
 
 add_turns(turn(Deg1),turn(Deg2), turn((Deg1 + Deg2) mod 360)).
 sub_turns(turn(Deg1), turn(Deg2), turn((Deg1 - Deg2) mod 360)).
