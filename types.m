@@ -32,10 +32,26 @@
 % sub_turns performs 1 turn left and the next in the opposite direction.
 :- pred sub_turns(elem::in, elem::in, elem::out) is semidet.
 
+% is_positive checks if provided step is a net positive.
+:- pred is_positive(elem::in) is semidet.
+
+% (>) tests is one first step is more than the second.
+:- pred (elem::in) > (elem::in) is semidet.
+
 %---------------------------------------------------------------------------%
 :- implementation.
 
 :- import_module int.
+
+is_positive(step(X,Y)) :-
+  if X < 0
+  then Y >= 0, Y * Y > 2 * X * X
+  else (
+    Y > 0
+  ; Y =< 0, 2 * X * X > Y * Y
+  ).
+
+step(A1, A2) > step(B1, B2) :- is_positive(step(A1-B1, A2-B2)).
 
 left(A) = turn(A mod 360).
 right(A) = turn((-A) mod 360).
