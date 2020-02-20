@@ -36,7 +36,7 @@
 :- import_module int.
 :- import_module pprint.
 
-append_turns(turn(Deg1), turn(Deg2), turn((Deg1 + Deg2 + 180) mod 360)).
+append_turns(turn(Deg1), turn(Deg2), normalize_turn(turn((Deg1 + Deg2 + 180) mod 360))).
 invert_turn(turn(D)) = normalize_turn(turn(-D)).
 
 has_nil(A) :- any_true(is_nil, A).

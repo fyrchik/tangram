@@ -73,6 +73,6 @@ sub_steps(step(A1,B1), step(A2,B2), S) :-
   S = step(A1 - A2, B1 - B2),
   (is_nil(S) ; is_positive(S)).
 
-add_turns(turn(Deg1),turn(Deg2), turn((Deg1 + Deg2) mod 360)).
-sub_turns(turn(Deg1), turn(Deg2), turn((Deg1 - Deg2) mod 360)).
+add_turns(turn(Deg1),turn(Deg2), normalize_turn(turn(Deg1 + Deg2))).
+sub_turns(turn(Deg1), turn(Deg2), normalize_turn(turn(Deg1 - Deg2))).
 %---------------------------------------------------------------------------%
