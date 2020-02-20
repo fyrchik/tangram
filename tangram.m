@@ -3,7 +3,6 @@
 
 :- interface.
 
-:- import_module io.
 :- import_module list.
 
 :- import_module types.
