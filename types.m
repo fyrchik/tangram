@@ -39,6 +39,14 @@
 % sub_turns performs 1 turn left and the next in the opposite direction.
 :- pred sub_turns(elem::in, elem::in, elem::out) is semidet.
 
+% (+) adds 2 elements provided both are turns or steps
+% and throws an exception otherwise.
+:- func (elem) + (elem) = elem.
+
+% (-) returns a difference of 2 elements provided both are turns or steps
+% and throws an exception otherwise.
+:- func (elem) - (elem) = elem.
+
 % is_positive checks if provided step is a net positive.
 :- pred is_positive(elem::in) is semidet.
 
@@ -48,6 +56,7 @@
 %---------------------------------------------------------------------------%
 :- implementation.
 
+:- import_module exception.
 :- import_module int.
 
 % we use 179 so that 180 will be 180 and not -180
@@ -69,6 +78,25 @@ right(A) = turn((-A) mod 360).
 
 is_nil(step(0,0)).
 is_nil(turn(D)) :- D mod 360 = 0.
+
+X + Y = Result :-
+  X = step(A1,B1), Y = step(A2,B2) -> Result = step(A1+A2,B1+B2)
+; X = turn(Deg1), Y = turn(Deg2) -> Result = normalize_turn(turn(Deg1 + Deg2))
+; throw("invalid arguments for (+). Use add_steps or add_turns instead.")
+.
+
+X - Y = Result :-
+  X = step(A1,B1), Y = step(A2,B2) -> (
+    S = step(A1-A2, B1-B2),
+    (
+      if is_positive(S)
+      then Result = S
+      else throw("negative step in (-). Use sub_steps or sub_turns instead.")
+    )
+  )
+; X = turn(Deg1), Y = turn(Deg2) -> Result = normalize_turn(turn(Deg1 + Deg2))
+; throw("invalid arguments for (-). Use sub_steps or sub_turns instead.")
+.
 
 add_steps(step(A1,B1),step(A2,B2), step(A1+A2,B1+B2)).
 sub_steps(step(A1,B1), step(A2,B2), S) :-

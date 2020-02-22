@@ -74,7 +74,12 @@ combine_aux(First, Second, Middle, Result) :-
 % first argument must end in turn
 % second argument must start from step
 % third argument must start in step
-insert_after(Es1, [S2,T2|Es2], [S3,T31|Es3], X) :-
+insert_after(
+    Es1,
+    [step(_,_) @ S2, turn(_) @ T2 | Es2],
+    [step(_,_) @ S3, turn(_) @ T31|Es3],
+    X
+  ) :-
   (
     if split_last(Es1, M1, T1),
        split_last(Es3, M3, T3Last),
@@ -85,21 +90,24 @@ insert_after(Es1, [S2,T2|Es2], [S3,T31|Es3], X) :-
       condense([M1, [FirstT], M3, [LastT], Es2], Y)
     ;
       S2 > S3,
-      sub_steps(S2, S3, LastS),
       LastT = reverse_turn(T3Last),
-      condense([M1, [FirstT], M3, [LastT, LastS, T2], Es2], Y)
+      condense([M1, [FirstT], M3, [LastT, S2 - S3, T2], Es2], Y)
     ;
       S3 > S2,
-      sub_steps(S2, S3, LastS),
       LastT = reverse_turn(T2),
-      condense([M1, [FirstT], Es3, [LastS, LastT], Es2], Y)
+      condense([M1, [FirstT], Es3, [S3 - S2, LastT], Es2], Y)
     ),
     X = normalize(Y)
     else fail
   ).
 
 
-insert_before(Es1, [S2,T2|Es2], [S3,T31|Es3], X) :-
+insert_before(
+    Es1,
+    [step(_,_) @ S2, turn(_) @ T2 | Es2],
+    [step(_,_) @ S3, turn(_) @ T31 | Es3],
+    X
+  ) :-
   (
     if split_last(Es1, M1, T1),
        split_last(Es3, M3, T3Last),
@@ -144,8 +152,7 @@ normalize(A) = Result :-
 collapse_bound_steps(Figure) = Result :-
   if [step(_,_) @ First, T | X] = Figure
    , split_last(X, M, step(_,_) @ Last)
-   , add_steps(First, Last, S)
-  then Result = append(M, [S, T])
+  then Result = append(M, [First + Last, T])
   else Result = Figure.
 
 :- func move_step_to_end(figure) = figure.
