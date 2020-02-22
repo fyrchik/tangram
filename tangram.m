@@ -68,7 +68,7 @@ combine_aux(First, Second, Middle, Result) :-
   ; insert_before(First, Second, Middle, Result)
   ; (
     [H | T] = Second,
-    append(First, [H], Next),
+    Next = append(First, [H]),
     combine_aux(Next, T, Middle, W),
     Result = normalize(W)
   ).
@@ -90,15 +90,15 @@ insert_after(
     then (
       S2 = S3,
       append_turns(T3Last, T2, LastT),
-      condense([M1, [FirstT], M3, [LastT], Es2], Y)
+      Y = condense([M1, [FirstT], M3, [LastT], Es2])
     ;
       S2 > S3,
       LastT = reverse_turn(T3Last),
-      condense([M1, [FirstT], M3, [LastT, S2 - S3, T2], Es2], Y)
+      Y = condense([M1, [FirstT], M3, [LastT, S2 - S3, T2], Es2])
     ;
       S3 > S2,
       LastT = reverse_turn(T2),
-      condense([M1, [FirstT], Es3, [S3 - S2, LastT], Es2], Y)
+      Y = condense([M1, [FirstT], Es3, [S3 - S2, LastT], Es2])
     ),
     X = normalize(Y)
     else fail
@@ -118,17 +118,17 @@ insert_before(
     then (
       S2 = S3,
       append_turns(T1, T31, FirstT),
-      condense([M1, [FirstT], M3, [LastT], Es2], Y)
+      Y = condense([M1, [FirstT], M3, [LastT], Es2])
     ;
       S2 > S3,
       sub_steps(S2, S3, FirstS),
       FirstT = reverse_turn(T31),
-      condense([Es1, [FirstS, FirstT], M3, [LastT], Es2], Y)
+      Y = condense([Es1, [FirstS, FirstT], M3, [LastT], Es2])
     ;
       S3 > S2,
       FirstT = reverse_turn(T1),
       sub_steps(S3, S2, FirstS),
-      condense([M1, [FirstT, FirstS, T31], M3, [LastT], Es2], Y)
+      Y = condense([M1, [FirstT, FirstS, T31], M3, [LastT], Es2])
     ),
     X = normalize(Y)
     else fail
@@ -221,7 +221,8 @@ move_step_to_end([]) = [].
 move_step_to_end([E | Es] @ List) = Result :-
   if E = turn(_)
   then Result = List
-  else append(Es, [E], X), Result = X.
+  else Result = append(Es, [E])
+  .
 
 :- func find_max_step_index(figure) = int.
 find_max_step_index(List) = Result :-
