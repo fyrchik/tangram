@@ -63,7 +63,6 @@ max_to_head(List) = Result :-
   ).
 
 :- pred combine_aux(figure::in, figure::in, figure::in, figure::out) is nondet.
-combine_aux(_, [], _, _) :- fail.
 combine_aux(First, Second, Middle, Result) :-
     insert_after(First, Second, Middle, Result)
   ; insert_before(First, Second, Middle, Result)
