@@ -48,6 +48,11 @@ main(!IO) :-
             [step(2, 0), turn(135), step(0, 2), turn(90), step(0, 2), turn(135)],
             [step(1,0), left(90+45), step(0,2), left(90+45), step(1,0), left(90)],
             [step(1,0), left(90+45), step(0,2), left(90+45), step(1,0), left(90)]
+        ],
+        [ % big square without quarter + quarter = big square
+            [step(2,0), left(90), step(2,0), left(90), step(2,0), left(90), step(2,0), left(90)],
+            [step(2,0), left(90), step(2,0), left(90), step(1,0), left(90), step(1,0), left(-90), step(1,0), left(90), step(1,0), left(90)],
+            [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)]
         ]
     ],
     Result = negated_filter(test_single, TestCases),

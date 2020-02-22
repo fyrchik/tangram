@@ -24,6 +24,8 @@
 
 :- implementation.
 
+:- import_module bool.
+:- import_module exception.
 :- import_module int, list, string.
 :- import_module utils.
 
@@ -46,7 +48,9 @@ combine_list([F1 | T], Result) :-
 combine(A, B, Result) :-
   combine_aux([], A, B, R)
 , R2 = collapse_bound_steps(R)
-, Result = max_to_head(R2).
+, R3 = max_to_head(R2)
+, G = remove180(R3)
+, Result = collapse_elems(G).
 
 :- func max_to_head(figure) = figure.
 max_to_head(List) = Result :- 
@@ -133,6 +137,64 @@ insert_before(
 
 :- func reverse_turn(elem) = elem is semidet.
 reverse_turn(turn(D)) = normalize_turn(turn(D-180)).
+
+% remove180 transforms a figure into an equivalent but
+% without backturns except possibly as a first element.
+:- func remove180(figure) = figure.
+remove180([]) = [].
+remove180([_] @ List) = List.
+remove180([_,_] @ List) = List.
+remove180([turn(_) @ T | [_, _ | _] @ Tail]) = Result :-
+  Lst = prepend(T, remove180(Tail)),
+  ( Lst = [turn(0) | TailLst] ->
+      Result = TailLst
+    ; Result = Lst
+  ).
+remove180([step(_,_) @ Step1 | [Turn1 | [Step2 | Es] @ Tail]]) = Result :-
+  Turn1 = turn(_), Step2 = step(_,_) ->
+    (
+      Turn1 = turn(180) -> (
+        Step1 = Step2 ->
+        Result = prepend(Turn1, remove180(Es))
+      ; Step1 > Step2 ->
+        Lst = remove180(Es),
+        Step = Step1 - Step2,
+        Result = remove180(prepend(Step, Lst))
+      ; Lst = remove180(Es),
+        Step = Step2 - Step1,
+        Result = remove180([Turn1, Step | Lst])
+      )
+      ; Turn1 = turn(0) -> Result = remove180([Step1 + Step2 | Es])
+      ; Lst = remove180(Tail),
+        NewList = prepend(Turn1, Lst),
+        T = det_head(NewList),
+        NewListTail = det_tail(NewList),
+        ( T = turn(180) -> Result = remove180([Step1 | NewList])
+        ; T = turn(0) -> Result = prepend(Step1, NewListTail)
+        ; Result = prepend(Step1, NewList)
+        )
+    )
+  ; Lst = remove180(Tail),
+    NewList = prepend(Turn1, Lst),
+    ( head(NewList) = turn(180) ->
+        Result = remove180([Step1 | NewList])
+      ; Result = prepend(Step1, NewList)
+    )
+  .
+
+:- func prepend(elem, figure) = figure.
+prepend(E, []) = [E].
+prepend(step(_,_) @ S, [Step | Es] @ List) =
+  ( if Step = step(_,_)
+    then [S + Step | Es]
+    else [S | List]
+  ).
+prepend(turn(_) @ T, [Turn | Es] @ List) =
+  (
+    if Turn = turn(_)
+    then [T + Turn | Es]
+    else [T | List]
+  ).
 
 normalize(A) = Result :-
   (
