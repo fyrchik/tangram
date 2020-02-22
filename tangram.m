@@ -55,11 +55,10 @@ combine(A, B, Result) :-
 :- func max_to_head(figure) = figure.
 max_to_head(List) = Result :- 
   Ind = find_max_step_index(List),
-  (
-    if Ind > 0
-    then split_upto(Ind, List, Start, End)
-       , Result = append(End, Start)
-    else Result = List
+  ( Ind =< 0 ->
+      Result = List
+    ; split_upto(Ind, List, Start, End)
+    , Result = append(End, Start)
   ).
 
 :- pred combine_aux(figure::in, figure::in, figure::in, figure::out) is nondet.
@@ -84,10 +83,10 @@ insert_after(
     X
   ) :-
   (
-    if split_last(Es1, M1, T1),
-       split_last(Es3, M3, T3Last),
-       append_turns(T1, T31, FirstT)
-    then (
+    split_last(Es1, M1, T1),
+    split_last(Es3, M3, T3Last),
+    append_turns(T1, T31, FirstT),
+    (
       S2 = S3,
       append_turns(T3Last, T2, LastT),
       Y = condense([M1, [FirstT], M3, [LastT], Es2])
@@ -101,7 +100,6 @@ insert_after(
       Y = condense([M1, [FirstT], Es3, [S3 - S2, LastT], Es2])
     ),
     X = normalize(Y)
-    else fail
   ).
 
 
@@ -111,11 +109,10 @@ insert_before(
     [step(_,_) @ S3, turn(_) @ T31 | Es3],
     X
   ) :-
-  (
-    if split_last(Es1, M1, T1),
-       split_last(Es3, M3, T3Last),
-       append_turns(T3Last, T2, LastT)
-    then (
+  ( split_last(Es1, M1, T1),
+    split_last(Es3, M3, T3Last),
+    append_turns(T3Last, T2, LastT),
+    (
       S2 = S3,
       append_turns(T1, T31, FirstT),
       Y = condense([M1, [FirstT], M3, [LastT], Es2])
@@ -131,7 +128,6 @@ insert_before(
       Y = condense([M1, [FirstT, FirstS, T31], M3, [LastT], Es2])
     ),
     X = normalize(Y)
-    else fail
   ).
 
 :- func reverse_turn(elem) = elem is semidet.
@@ -184,15 +180,14 @@ remove180([step(_,_) @ Step1 | [Turn1 | [Step2 | Es] @ Tail]]) = Result :-
 :- func prepend(elem, figure) = figure.
 prepend(E, []) = [E].
 prepend(step(_,_) @ S, [Step | Es] @ List) =
-  ( if Step = step(_,_)
-    then [S + Step | Es]
-    else [S | List]
+  ( Step = step(_,_) ->
+      [S + Step | Es]
+    ; [S | List]
   ).
 prepend(turn(_) @ T, [Turn | Es] @ List) =
-  (
-    if Turn = turn(_)
-    then [T + Turn | Es]
-    else [T | List]
+  ( Turn = turn(_) ->
+      [T + Turn | Es]
+    ; [T | List]
   ).
 
 normalize(A) = Result :-
@@ -218,11 +213,8 @@ collapse_bound_steps(Figure) = Result :-
 
 :- func move_step_to_end(figure) = figure.
 move_step_to_end([]) = [].
-move_step_to_end([E | Es] @ List) = Result :-
-  if E = turn(_)
-  then Result = List
-  else Result = append(Es, [E])
-  .
+move_step_to_end([turn(_) | _] @ List) = List.
+move_step_to_end([step(_,_) @ S | Es]) = append(Es, [S]).
 
 :- func find_max_step_index(figure) = int.
 find_max_step_index(List) = Result :-

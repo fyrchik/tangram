@@ -88,10 +88,8 @@ X + Y = Result :-
 X - Y = Result :-
   X = step(A1,B1), Y = step(A2,B2) -> (
     S = step(A1-A2, B1-B2),
-    (
-      if is_positive(S)
-      then Result = S
-      else throw("negative step in (-). Use sub_steps or sub_turns instead.")
+    ( is_positive(S) -> Result = S
+    ; throw("negative step in (-). Use sub_steps or sub_turns instead.")
     )
   )
 ; X = turn(Deg1), Y = turn(Deg2) -> Result = normalize_turn(turn(Deg1 + Deg2))
