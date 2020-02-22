@@ -44,12 +44,12 @@ has_nil(A) :- any_true(is_nil, A).
 remove_nil(A) = negated_filter(is_nil, A).
 
 collapse_elems([]) = [].
-collapse_elems([E]) = [E].
-collapse_elems([E1, E2 | Es]) = Result :-
+collapse_elems([_] @ List) = List.
+collapse_elems([E1 | [E2 | Es] @ Tail]) = Result :-
   (
     add_turns(E1, E2, E) -> Result = collapse_elems([E | Es])
   ; add_steps(E1, E2, E) -> Result = collapse_elems([E | Es])
-  ; Result = [E1 | collapse_elems([E2 | Es])]
+  ; Result = [E1 | collapse_elems(Tail)]
   ).
 
 write_traversal(List, !IO) :-

@@ -142,19 +142,17 @@ normalize(A) = Result :-
 
 :- func collapse_bound_steps(figure) = figure.
 collapse_bound_steps(Figure) = Result :-
-  if [First, T | X] = Figure
-   , split_last(X, M, Last)
-   , First = step(_,_)
-   , Last = step(_,_)
+  if [step(_,_) @ First, T | X] = Figure
+   , split_last(X, M, step(_,_) @ Last)
    , add_steps(First, Last, S)
   then Result = append(M, [S, T])
   else Result = Figure.
 
 :- func move_step_to_end(figure) = figure.
 move_step_to_end([]) = [].
-move_step_to_end([E | Es]) = Result :-
+move_step_to_end([E | Es] @ List) = Result :-
   if E = turn(_)
-  then Result = [E | Es]
+  then Result = List
   else append(Es, [E], X), Result = X.
 
 :- func find_max_step_index(figure) = int.
