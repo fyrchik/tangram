@@ -11,10 +11,6 @@
 %   corners a matched.
 :- pred append_turns(elem::in, elem::in, elem::out) is semidet.
 
-% invert_turn performs turn in the same direction but
-%   as if we were going backwards. 
-:- func invert_turn(elem) = elem is semidet.
-
 % has_nil checks if traversal has nil elements.
 :- pred has_nil(figure::in) is semidet.
 
@@ -42,7 +38,6 @@
 
 :- pragma inline(append_turns/3).
 append_turns(turn(Deg1), turn(Deg2), normalize_turn(turn((Deg1 + Deg2 + 180) mod 360))).
-invert_turn(turn(D)) = normalize_turn(turn(-D)).
 
 :- pragma inline(has_nil/1).
 has_nil(A) :- any_true(is_nil, A).
