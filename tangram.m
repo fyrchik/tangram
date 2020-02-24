@@ -20,6 +20,10 @@
 % normalize returns normalized Figure representation.
 :- func normalize(figure) = figure.
 
+% remove180 transforms a figure into an equivalent but
+% without backturns except possibly as a first element.
+:- func remove180(figure) = figure.
+
 %---------------------------------------------------------------------------%
 
 :- implementation.
@@ -133,9 +137,6 @@ insert_before(
 :- func reverse_turn(elem) = elem is semidet.
 reverse_turn(turn(D)) = normalize_turn(turn(D-180)).
 
-% remove180 transforms a figure into an equivalent but
-% without backturns except possibly as a first element.
-:- func remove180(figure) = figure.
 remove180([]) = [].
 remove180([_] @ List) = List.
 remove180([_,_] @ List) = List.

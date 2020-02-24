@@ -30,10 +30,14 @@
 % collapse_elems collapses successive multiple turns or steps into a single turn or step.
 :- func collapse_elems(figure) = figure.
 
+% reflect reflects figure which must be normalized.
+:- func reflect(figure) = figure.
+
 %---------------------------------------------------------------------------%
 :- implementation.
 
 :- import_module int.
+:- import_module exception.
 :- import_module pprint.
 
 append_turns(turn(Deg1), turn(Deg2), normalize_turn(turn((Deg1 + Deg2 + 180) mod 360))).
@@ -51,6 +55,10 @@ collapse_elems([E1 | [E2 | Es] @ Tail]) = Result :-
   ; add_steps(E1, E2, E) -> Result = collapse_elems([E | Es])
   ; Result = [E1 | collapse_elems(Tail)]
   ).
+
+reflect([]) = [].
+reflect([step(_,_) @ S | Es]) = [S | reverse(Es)].
+reflect([turn(_) | _ ]) = throw("non-normalized figure in reflect").
 
 write_traversal(List, !IO) :-
   pprint.write(80, to_doc(List), !IO).

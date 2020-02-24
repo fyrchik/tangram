@@ -5,7 +5,7 @@
 
 :- import_module io.
 
-:- pred main(io::di, io::uo) is det.
+:- pred main(io::di, io::uo) is cc_multi.
 
 %---------------------------------------------------------------------------%
 :- implementation.
@@ -35,15 +35,30 @@ main(!IO) :-
     % % Result is a square with 2 triangles combined via their hypotenuse.
     % Result = [step(0,1), turn(90), step(0,1), turn(90), step(0,1), turn(90), step(0,1)],
     % io.format("%s + %s = CAT\n", [First, Second], !IO),
-    X = [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)],
-    Y = [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)],
-    Z = [step(0,2), left(90+45), step(1,0), left(90), step(1,0), left(90+45)],
-    solutions(combine_list([X,Y,Z]), Out),
-    read_traversal_from_string("[step(1,0), turn(90), step(1,0), turn(90), step(1,0), turn(90), step(1,0), turn(90)].", Result),
-    io.write(Result, !IO),
-    io.nl(!IO),
-    io.format("Result\n", [], !IO),
-    write_traversal(Out, !IO)
+    %X = [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)],
+    %Y = [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)],
+    %Z = [step(0,2), left(90+45), step(1,0), left(90), step(1,0), left(90+45)],
+    %X = [
+    %    step(3,0), left(90), step(5,0), left(90), step(3,0), left(90),
+    %    step(2,0), left(90), step(1,0), left(90), step(1,0), right(90),
+    %    step(1,0), right(90), step(3,0), right(90), step(1,0), right(90),
+    %    step(1,0), left(90), step(1,0), left(90), step(2,0), left(90)
+    %],
+    %Y = [
+    %    step(3,0), left(90), step(1,0), left(90),
+    %    step(1,0), right(90), step(1,0), left(90), step(1,0), left(90),
+    %    step(1,0), right(90), step(1,0), left(90), step(1,0), left(90)
+    %],
+    X = [step(1,0), left(135), step(0,2), left(135), step(1,0), left(90)],
+    Y = [step(1,0), left(135), step(0,2), left(135), step(1,0), left(90)],
+    solutions(combine_list([X,Y]), Out),
+    det_split_list(14, X, A, B),
+    (insert_before(A, B, Y, R) -> Result = R; Result = []),
+    %read_traversal_from_string("[step(1,0), turn(90), step(1,0), turn(90), step(1,0), turn(90), step(1,0), turn(90)].", Result),
+    io.write_line(Result, !IO),
+    io.write_line(remove180(Result), !IO),
+    io.format("Result\n", [], !IO)
+    ,write_traversal(Out, !IO)
     .
 
 %---------------------------------------------------------------------------%
