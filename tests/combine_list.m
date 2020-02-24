@@ -28,9 +28,7 @@ main(!IO) :-
         [ % combine 2 equal triangles into a parallelogram
             [step(1,0), left(135), step(0,2), left(45), step(1,0), left(135), step(0,2), left(45)],
             [step(1,0), left(135), step(0,2), left(135), step(1,0), left(90)],
-            % TODO this test fails because arguments are not rotated yet
-            %[step(1,0), left(135), step(0,2), left(135), step(1,0), left(90)] 
-            [step(1,0), left(90), step(1,0), left(135), step(0,2), left(135)]
+            [step(1,0), left(135), step(0,2), left(135), step(1,0), left(90)]
         ],
         [ % combine 2 equal triangles hypotenuse to catet
           % where the right angle of the second triangle is in the middle of a hypotenuse

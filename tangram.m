@@ -50,7 +50,9 @@ combine_list([F1 | T], Result) :-
 %   2. Collapse 2 lists into one.
 %   3. Normalize the resulting list
 combine(A, B, Result) :-
-  combine_aux([], A, B, R)
+( combine_aux([], A, B, R)
+; combine_aux([], A, reflect(B), R)
+)
 , R2 = collapse_bound_steps(R)
 , R3 = max_to_head(R2)
 , G = remove180(R3)
