@@ -1,4 +1,4 @@
-.PHONY: tests
+.PHONY: tests Mercury.modules
 
 Mercury.modules:
 	mmc -f ../*.m
