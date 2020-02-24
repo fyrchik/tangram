@@ -1,3 +1,5 @@
+classic	../classic.m
+command	../command.m
 tangram	../tangram.m
 types	../types.m
 utils	../utils.m

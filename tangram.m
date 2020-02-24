@@ -13,6 +13,10 @@
 % combine_list succeeds on all possible combinations of arguments from list
 % where every list element is used.
 :- pred combine_list(list(figure)::in, figure::out) is nondet.
+% combine_list_with_trace is combine list but also returns trace as it's last arguments.
+% Trace is a sequence of intermediate results by means of which it easy to recovery
+% how figures were combined.
+:- pred combine_list_with_trace(list(figure)::in, figure::out, list(figure)::out) is nondet.
 
 :- pred insert_after(figure::in, figure::in, figure::in, figure::out) is nondet.
 :- pred insert_before(figure::in, figure::in, figure::in, figure::out) is nondet.
@@ -32,6 +36,21 @@
 :- import_module exception.
 :- import_module int, list, string.
 :- import_module utils.
+
+combine_list_with_trace([], [], []).
+combine_list_with_trace([H], H, []).
+combine_list_with_trace([Fig1 | Rest], Result, Trace) :-
+  (
+    [Fig2 | Rest2] = Rest,
+    combine(Fig1, Fig2, F),
+    combine_list_with_trace([F | Rest2], Result, T),
+    Trace = [F | T]
+  ; combine_list_with_trace(Rest, R, T),
+    combine(Fig1, R, Result),
+    Trace = append(T, [Result])
+  ).
+
+combine_list(Figures, Result) :- combine_list_with_trace(Figures, Result, _).
 
 combine_list([], []).
 combine_list([H], H).
@@ -57,6 +76,7 @@ combine(A, B, Result) :-
 , R3 = max_to_head(R2)
 , G = remove180(R3)
 , Result = collapse_elems(G).
+
 
 :- func max_to_head(figure) = figure.
 max_to_head(List) = Result :- 
