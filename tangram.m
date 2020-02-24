@@ -8,18 +8,30 @@
 :- import_module types.
 
 % combine succeeds on all possible combinations of first 2 arguments.
-:- pred combine(figure::in, figure::in, figure::out) is nondet.
+:- pred combine(figure, figure, figure).
+:- mode combine(in, in, out) is nondet.
+:- mode combine(in, in, in) is semidet.
 
 % combine_list succeeds on all possible combinations of arguments from list
 % where every list element is used.
-:- pred combine_list(list(figure)::in, figure::out) is nondet.
+:- pred combine_list(list(figure), figure).
+:- mode combine_list(in, out) is nondet.
+:- mode combine_list(in, in) is semidet.
+
 % combine_list_with_trace is combine list but also returns trace as it's last arguments.
 % Trace is a sequence of intermediate results by means of which it easy to recovery
 % how figures were combined.
-:- pred combine_list_with_trace(list(figure)::in, figure::out, list(figure)::out) is nondet.
+:- pred combine_list_with_trace(list(figure), figure, list(figure)).
+:- mode combine_list_with_trace(in, out, out) is nondet.
+:- mode combine_list_with_trace(in, in, out) is nondet.
 
-:- pred insert_after(figure::in, figure::in, figure::in, figure::out) is nondet.
-:- pred insert_before(figure::in, figure::in, figure::in, figure::out) is nondet.
+:- pred insert_after(figure, figure, figure, figure).
+:- mode insert_after(in, in, in, out) is nondet.
+:- mode insert_after(in, in, in, in) is semidet.
+
+:- pred insert_before(figure, figure, figure, figure).
+:- mode insert_before(in, in, in, out) is nondet.
+:- mode insert_before(in, in, in, in) is semidet.
 
 % normalize returns normalized Figure representation.
 :- func normalize(figure) = figure.
