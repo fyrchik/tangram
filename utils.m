@@ -40,11 +40,14 @@
 :- import_module exception.
 :- import_module pprint.
 
+:- pragma inline(append_turns/3).
 append_turns(turn(Deg1), turn(Deg2), normalize_turn(turn((Deg1 + Deg2 + 180) mod 360))).
 invert_turn(turn(D)) = normalize_turn(turn(-D)).
 
+:- pragma inline(has_nil/1).
 has_nil(A) :- any_true(is_nil, A).
 
+:- pragma inline(remove_nil/1).
 remove_nil(A) = negated_filter(is_nil, A).
 
 collapse_elems([]) = [].

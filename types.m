@@ -63,6 +63,7 @@
 % degrees are int anyway.
 normalize_turn(X) = (X = turn(D) -> turn((D+179) mod 360 - 179); X).
 
+:- pragma inline(is_positive/1).
 is_positive(step(X,Y)) :-
   if X < 0
   then Y >= 0, Y * Y > 2 * X * X
@@ -71,20 +72,27 @@ is_positive(step(X,Y)) :-
   ; Y =< 0, 2 * X * X > Y * Y
   ).
 
+:- pragma inline((>)/2).
 step(A1, A2) > step(B1, B2) :- is_positive(step(A1-B1, A2-B2)).
 
+:- pragma inline(left/1).
 left(A) = turn(A mod 360).
+
+:- pragma inline(right/1).
 right(A) = turn((-A) mod 360).
 
+:- pragma inline(is_nil/1).
 is_nil(step(0,0)).
 is_nil(turn(D)) :- D mod 360 = 0.
 
+:- pragma inline((+)/2).
 X + Y = Result :-
   X = step(A1,B1), Y = step(A2,B2) -> Result = step(A1+A2,B1+B2)
 ; X = turn(Deg1), Y = turn(Deg2) -> Result = normalize_turn(turn(Deg1 + Deg2))
 ; throw("invalid arguments for (+). Use add_steps or add_turns instead.")
 .
 
+:- pragma inline((-)/2).
 X - Y = Result :-
   X = step(A1,B1), Y = step(A2,B2) -> (
     S = step(A1-A2, B1-B2),
@@ -96,11 +104,17 @@ X - Y = Result :-
 ; throw("invalid arguments for (-). Use sub_steps or sub_turns instead.")
 .
 
-add_steps(step(A1,B1),step(A2,B2), step(A1+A2,B1+B2)).
-sub_steps(step(A1,B1), step(A2,B2), S) :-
+:- pragma inline(add_steps/3).
+add_steps(step(A1, B1), step(A2, B2), step(A1+A2, B1+B2)).
+
+:- pragma inline(sub_steps/3).
+sub_steps(step(A1, B1), step(A2, B2), S) :-
   S = step(A1 - A2, B1 - B2),
   (is_nil(S) ; is_positive(S)).
 
-add_turns(turn(Deg1),turn(Deg2), normalize_turn(turn(Deg1 + Deg2))).
+:- pragma inline(add_turns/3).
+add_turns(turn(Deg1), turn(Deg2), normalize_turn(turn(Deg1 + Deg2))).
+
+:- pragma inline(sub_turns/3).
 sub_turns(turn(Deg1), turn(Deg2), normalize_turn(turn(Deg1 - Deg2))).
 %---------------------------------------------------------------------------%
