@@ -33,9 +33,6 @@
 :- mode insert_before(in, in, in, out) is nondet.
 :- mode insert_before(in, in, in, in) is semidet.
 
-% normalize returns normalized Figure representation.
-:- func normalize(figure) = figure.
-
 % remove180 transforms a figure into an equivalent but
 % without backturns except possibly as a first element.
 :- func remove180(figure) = figure.
@@ -107,7 +104,7 @@ combine_aux(First, Second, Middle, Result) :-
     [H | T] = Second,
     Next = append(First, [H]),
     combine_aux(Next, T, Middle, W),
-    Result = normalize(W)
+    Result = collapse_elems(W)
   ).
 
 % insert_after inserts third argument between first and second.
@@ -137,7 +134,7 @@ insert_after(
       LastT = reverse_turn(T2),
       Y = condense([M1, [FirstT], Es3, [S3 - S2, LastT], Es2])
     ),
-    X = normalize(Y)
+    X = collapse_elems(Y)
   ).
 
 
@@ -165,7 +162,7 @@ insert_before(
       sub_steps(S3, S2, FirstS),
       Y = condense([M1, [FirstT, FirstS, T31], M3, [LastT], Es2])
     ),
-    X = normalize(Y)
+    X = collapse_elems(Y)
   ).
 
 :- func reverse_turn(elem) = elem is semidet.
@@ -223,20 +220,6 @@ prepend(turn(_) @ T, [Turn | Es] @ List) =
   ( Turn = turn(_) ->
       [T + Turn | Es]
     ; [T | List]
-  ).
-
-normalize(A) = Result :-
-  (
-    % remove all nil elements
-    B = remove_nil(A),
-    % collapse sequences of turns/steps into one turn/step
-    C = collapse_elems(B),
-    % remove nils again. Note: only nil turns will be removed
-    % because no nil steps could appear during previous collapse.
-    D = remove_nil(C),
-    % only steps will be collapsed here
-    F = collapse_elems(D),
-    Result = map(normalize_turn, F)
   ).
 
 :- func collapse_bound_steps(figure) = figure.

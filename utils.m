@@ -48,13 +48,32 @@ has_nil(A) :- any_true(is_nil, A).
 remove_nil(A) = negated_filter(is_nil, A).
 
 collapse_elems([]) = [].
-collapse_elems([_] @ List) = List.
-collapse_elems([E1 | [E2 | Es] @ Tail]) = Result :-
-  (
-    add_turns(E1, E2, E) -> Result = collapse_elems([E | Es])
-  ; add_steps(E1, E2, E) -> Result = collapse_elems([E | Es])
+collapse_elems([E] @ List) = Result :-
+  (is_nil(E) ->
+    Result = []
+  ; Result = List
+  )
+  .
+collapse_elems([step(_,_) @ E1, step(_,_) @ E2 | Es]) = collapse_elems([E1 + E2 | Es]).
+collapse_elems([turn(_) @ E1, turn(_) @ E2 | Es]) = Result :-
+  T = E1 + E2,
+  (T = turn(0) ->
+    Result = collapse_elems(Es)
+  ; Result = collapse_elems([T | Es])
+  )
+  .
+collapse_elems([turn(_) @ E1 | [step(_,_) | _] @ Tail]) = Result :-
+  (E1 = turn(0) ->
+    Result = collapse_elems(Tail)
   ; Result = [E1 | collapse_elems(Tail)]
-  ).
+  )
+  .
+collapse_elems([step(_,_) @ E1 | [turn(_) | _] @ Tail]) = Result :-
+  (E1 = step(0, 0) ->
+    Result = collapse_elems(Tail)
+  ; Result = [E1 | collapse_elems(Tail)]
+  )
+  .
 
 reflect([]) = [].
 reflect([step(_,_) @ S | Es]) = [S | reverse(Es)].
