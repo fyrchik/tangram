@@ -53,6 +53,20 @@ main(!IO) :-
             [step(2,0), left(90), step(2,0), left(90), step(2,0), left(90), step(2,0), left(90)],
             [step(2,0), left(90), step(2,0), left(90), step(1,0), left(90), step(1,0), left(-90), step(1,0), left(90), step(1,0), left(90)],
             [step(1,0), left(90), step(1,0), left(90), step(1,0), left(90), step(1,0), left(90)]
+        ],
+        [ % 2 complex figures which should be combined into a big rectangle
+            [step(5,0), left(90), step(3,0), left(90), step(5,0), left(90), step(3,0), left(90)],
+            [
+                step(3,0), left(90), step(5,0), left(90), step(3,0), left(90),
+                step(2,0), left(90), step(1,0), left(90), step(1,0), right(90),
+                step(1,0), right(90), step(3,0), right(90), step(1,0), right(90),
+                step(1,0), left(90), step(1,0), left(90), step(2,0), left(90)
+            ],
+            [
+                step(1,0), left(90), step(3,0), left(90), step(1,0), left(90),
+                step(1,0), right(90), step(1,0), left(90), step(1,0), left(90),
+                step(1,0), right(90), step(1,0), left(90)
+            ]
         ]
     ],
     Result = negated_filter(test_single, TestCases),
@@ -68,6 +82,6 @@ main(!IO) :-
 write_traversal3(List, !IO) :- pprint.write(80, to_doc(List), !IO).
 
 :- pred test_single(list(list(elem))::in) is semidet.
-test_single([Result | Elems]) :- tangram.combine_list(Elems, Result).
+test_single([Result | Elems]) :- combine_list(Elems, Result).
 
 %---------------------------------------------------------------------------%
