@@ -14,6 +14,11 @@
 
 :- type figure == list(elem).
 
+% figure_equals is a custom equality predicate for figure
+% which takes rotation into account.
+:- pred figure_equals(figure, figure).
+:- mode figure_equals(in, in) is semidet.
+
 % left is a turn left specified in degrees.
 :- func left(int) = elem.
 
@@ -117,4 +122,18 @@ add_turns(turn(Deg1), turn(Deg2), normalize_turn(turn(Deg1 + Deg2))).
 
 :- pragma inline(sub_turns/3).
 sub_turns(turn(Deg1), turn(Deg2), normalize_turn(turn(Deg1 - Deg2))).
+
+figure_equals(Fig1, Fig2) :-
+  Indices = 0..length(Fig2)-1,
+  Pred = (pred(Index::in) is semidet :-
+    figure_equals_aux(Fig1, Fig2, Index)
+  ),
+  any_true(Pred, Indices).
+
+:- pred figure_equals_aux(figure, figure, int).
+:- mode figure_equals_aux(in, in, in) is semidet.
+figure_equals_aux(Fig1, Fig2, Index) :-
+  det_split_list(Index, Fig2, Start, End),
+  Fig1 = append(End, Start).
+
 %---------------------------------------------------------------------------%
